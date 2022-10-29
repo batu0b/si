@@ -1,0 +1,22 @@
+.allHeight {
+  height: 100% !important;
+}
+
+.allWidth {
+  width: 100% !important;
+}
+
+.border_bottom{
+  border-bottom: 2px solid rgb(175, 171, 171);
+  width: 90% !important;
+}
+.getOutNav {
+  margin-top: 56px;
+}
+
+.centerPage {
+  margin-top: 100px;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  width: 50%;
+  height: 100%;
+}
