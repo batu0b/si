@@ -6,16 +6,20 @@ import CenterPage from "../components/CenterPage";
 import NavBar from "../components/NavBar";
 import { auth, db } from "../config/FirebaseConfig";
 import { UserContext } from "../context/UserContext";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 export default function SearchPage() {
-  const [myName , setMyName] = useState("")
- 
+  const [myName, setMyName] = useState("");
 
   const { filteredItems } = useContext(UserContext);
 
   const { searchName } = useParams();
 
   const [state, setState] = useState([]);
+
+  const MySwal = withReactContent(Swal);
+
   useEffect(() => {
     onSnapshot(collection(db, "users"), (snapshot) => {
       setState(snapshot.docs);
@@ -32,38 +36,44 @@ export default function SearchPage() {
     );
   });
 
-
   useEffect(() => {
-      filteredItems.map(x => {
-        setMyName(x.data().username)
-      })
-  
-  
-  }, [])
-  
+    filteredItems.map((x) => {
+      setMyName(x.data().username);
+    });
+  }, []);
 
-
-  const addFriend = async(id ,name) => {
-
+  const addFriend = async (id, name) => {
     try {
-      await setDoc(doc(db, "users", `${auth.currentUser?.uid}`, "friends", `${id}`), {
-        username: name,
-        userId: id
-        
-      });
+      await setDoc(
+        doc(db, "users", `${auth.currentUser?.uid}`, "friends", `${id}`),
+        {
+          username: name,
+          userId: id,
+        }
+      );
 
-      await setDoc(doc(db, "users", `${id}`, "friends", `${auth.currentUser?.uid}`), {
-        username: myName ,
-        userId: auth.currentUser.uid
-        
-      });
-    }
-    catch (err) {
+      await setDoc(
+        doc(db, "users", `${id}`, "friends", `${auth.currentUser?.uid}`),
+        {
+          username: myName,
+          userId: auth.currentUser.uid,
+        }
+      );
+    } catch (err) {
       console.log(err);
-    } }
+    }
+  };
 
-
- 
+  const ShowAfterAdd = async (id, name) => {
+    addFriend(id, name).then(() => {
+      return MySwal.fire({
+        icon: "success",
+        title: "Added",
+        text: "Congratulations You Now Have a New Friend",
+        heightAuto: "100%",
+      });
+    });
+  };
 
   return (
     <>
@@ -94,7 +104,7 @@ export default function SearchPage() {
             {SearchUsers.map((x) => {
               return (
                 <div
-                className="border_bottom"
+                  className="border_bottom"
                   key={Math.random()}
                   style={{
                     padding: 20,
@@ -102,12 +112,17 @@ export default function SearchPage() {
                     display: "flex",
                     width: "100%",
                     justifyContent: "space-around",
-                    alignItems: "center"
-                    
+                    alignItems: "center",
                   }}
                 >
                   <span>{x.data().username}</span>
-                  <Button onClick={() => addFriend(x.data().userId , x.data().username )}>Add Friend </Button>
+                  <Button
+                    onClick={() =>
+                      ShowAfterAdd(x.data().userId, x.data().username)
+                    }
+                  >
+                    Add Friend{" "}
+                  </Button>
                 </div>
               );
             })}

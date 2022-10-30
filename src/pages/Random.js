@@ -7,12 +7,16 @@ import NavBar from "../components/NavBar";
 import { auth, db } from "../config/FirebaseConfig";
 import { RandomContext } from "../context/RandomFriend";
 import { UserContext } from "../context/UserContext";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 export default function RandomPage() {
   const [myName, setMyName] = useState("");
 
   const { filteredItems } = useContext(UserContext);
   const { randomFriends, FilterRandom, show } = useContext(RandomContext);
+  const MySwal = withReactContent(Swal);
+
   useEffect(() => {
     filteredItems.map((x) => {
       return setMyName(x.data().username);
@@ -41,6 +45,16 @@ export default function RandomPage() {
     }
   };
 
+  const ShowAfterAdd = async (id, name) => {
+    addFriend(id, name).then(() => {
+      return MySwal.fire({
+        icon: "success",
+        title: "Added",
+        text: "Congratulations You Now Have a New Friend",
+        heightAuto: "100%",
+      });
+    });
+  };
   return (
     <>
       <NavBar />
@@ -83,7 +97,10 @@ export default function RandomPage() {
                   <span>{randomFriends?.username}</span>
                   <Button
                     onClick={() =>
-                      addFriend(randomFriends?.userId, randomFriends?.username)
+                      ShowAfterAdd(
+                        randomFriends?.userId,
+                        randomFriends?.username
+                      )
                     }
                   >
                     Add Friend{" "}

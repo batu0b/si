@@ -16,6 +16,7 @@ import NavBar from "../components/NavBar";
 import { auth, db } from "../config/FirebaseConfig";
 import { AiFillCaretDown, AiFillCaretUp } from "react-icons/ai";
 import { useIsLike } from "../hooks/hooks";
+import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDissatisfied";
 export default function Home() {
   const [state, setState] = useState([]);
   const [friends, setFriends] = useState([]);
@@ -163,8 +164,9 @@ export default function Home() {
             value: false,
           }
         );
-        deleteDoc(doc(db, "users", `${auth.currentUser?.uid}`, "likedposts", `${id}`));
-        
+        deleteDoc(
+          doc(db, "users", `${auth.currentUser?.uid}`, "likedposts", `${id}`)
+        );
       } else if (!docSnap.data().value) {
       }
     } catch (err) {
@@ -201,6 +203,8 @@ export default function Home() {
     }, 1200);
   };
 
+  console.log(FilterHomeContent);
+
   return (
     <>
       <NavBar />
@@ -216,51 +220,71 @@ export default function Home() {
         }}
       >
         <CenterPage>
-          {FilterHomeContent.map((x) => {
-            return (
-              <div key={x.id} style={{ marginBottom: 30 }}>
-                <ListGroup style={{borderRadius: 0}} >
-                  <ListGroup.Item active>
-                    {x.data().name} - {x.data().showDate}
-                  </ListGroup.Item>
-                  <ListGroup.Item variant="dark">
-                    <h4>{x.data().tittle}</h4>
-                  </ListGroup.Item  >
-                  <ListGroup.Item  variant="dark">{x.data().mainText}</ListGroup.Item>
-                  <ListGroup.Item variant="dark" >
-                    <div
-                      style={{
-                        width: "50%",
-                        display: "flex",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <span>
-                        <Button
-                          variant="light"
-                          className={x.id}
-                          onClick={() => WaitLike(x.id)}
+          {FilterHomeContent.length > 0 ? (
+            <>
+              {FilterHomeContent.map((x) => {
+                return (
+                  <div key={x.id} style={{ marginBottom: 30 }}>
+                    <ListGroup style={{ borderRadius: 0 }}>
+                      <ListGroup.Item active>
+                        {x.data().name} - {x.data().showDate}
+                      </ListGroup.Item>
+                      <ListGroup.Item variant="dark">
+                        <h4>{x.data().tittle}</h4>
+                      </ListGroup.Item>
+                      <ListGroup.Item variant="dark">
+                        {x.data().mainText}
+                      </ListGroup.Item>
+                      <ListGroup.Item variant="dark">
+                        <div
+                          style={{
+                            width: "50%",
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
                         >
-                          <AiFillCaretUp color="green" size={17} />(
-                          {x.data().totlike})
-                        </Button>
-                      </span>
-                      <span>
-                        <Button
-                          variant="light"
-                          className={x.id}
-                          onClick={() => WaitDislike(x.id)}
-                        >
-                          <AiFillCaretDown color="red" size={17} />(
-                          {x.data().totdislike})
-                        </Button>{" "}
-                      </span>
-                    </div>
-                  </ListGroup.Item>
-                </ListGroup>
-              </div>
-            );
-          })}
+                          <span>
+                            <Button
+                              variant="light"
+                              className={x.id}
+                              onClick={() => WaitLike(x.id)}
+                            >
+                              <AiFillCaretUp color="green" size={17} />(
+                              {x.data().totlike})
+                            </Button>
+                          </span>
+                          <span>
+                            <Button
+                              variant="light"
+                              className={x.id}
+                              onClick={() => WaitDislike(x.id)}
+                            >
+                              <AiFillCaretDown color="red" size={17} />(
+                              {x.data().totdislike})
+                            </Button>{" "}
+                          </span>
+                        </div>
+                      </ListGroup.Item>
+                    </ListGroup>
+                  </div>
+                );
+              })}
+            </>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "column",
+                height: "100%",
+                fontFamily: "monospace",
+              }}
+            >
+              <SentimentVeryDissatisfiedIcon />
+              <h2>nothing to see at the moment</h2>
+            </div>
+          )}
         </CenterPage>
       </div>
     </>

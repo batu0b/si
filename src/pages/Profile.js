@@ -1,6 +1,6 @@
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
 import React, { useContext, useEffect, useState } from "react";
-import { Button, ListGroup } from "react-bootstrap";
+import { Button, ListGroup, Table } from "react-bootstrap";
 import CenterPage from "../components/CenterPage";
 import NavBar from "../components/NavBar";
 import { auth, db, logOut } from "../config/FirebaseConfig";
@@ -30,6 +30,20 @@ export default function Profile() {
     );
   }, []);
 
+  const Delete = async (id) => {
+    try {
+      await deleteDoc(
+        doc(db, "users", `${auth.currentUser?.uid}`, "friends", `${id}`)
+      );
+
+      await deleteDoc(
+        doc(db, "users", `${id}`, "friends", `${auth.currentUser?.uid}`)
+      );
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <>
       <NavBar />
@@ -55,14 +69,19 @@ export default function Profile() {
             }}
           >
             <div
+              className="bg-dark text-light"
               style={{
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                flexShrink: 5,
+                borderBottomLeftRadius: 40,
+                borderBottomRightRadius: 40,
+                borderTopRightRadius: 8,
+                borderTopLeftRadius: 8,
+
                 height: "100%",
-                textAlign: "center"
+                textAlign: "center",
               }}
             >
               <span
@@ -70,16 +89,31 @@ export default function Profile() {
                   width: "100%",
                   display: "flex",
                   justifyContent: "center",
-                  textAlign: "center"
+                  textAlign: "center",
+                  flexDirection: "column",
+                  alignItems: "center",
                 }}
               >
                 {" "}
-                <p>User Name: </p>{" "}
-                <p>
-                   {filteredItems.map((x) => {
-                    return x.data().username;
-                  })}
+                <p
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    textAlign: "center",
+                    alignItems: "center",
+                    fontFamily: "monospace",
+                  }}
+                >
+                  <h3>User Name:&nbsp;</h3>{" "}
+                  <h3>
+                    {filteredItems.map((x) => {
+                      return x.data().username;
+                    })}
+                  </h3>
                 </p>
+                <Button variant="danger" onClick={logOut}>
+                  Log Out
+                </Button>{" "}
               </span>
               <span
                 style={{
@@ -89,33 +123,74 @@ export default function Profile() {
                 }}
               >
                 <Button
-                  variant="info"
+                  variant="outline-primary"
                   disabled={page}
                   onClick={() => setPage(true)}
                 >
                   Show Friends
                 </Button>{" "}
                 <Button
-                  variant="info"
+                  variant="outline-primary"
                   disabled={!page}
                   onClick={() => setPage(false)}
                 >
                   Show Liked Posts
                 </Button>
-                <Button variant="danger" onClick={logOut}>
-                  Log Out
-                </Button>{" "}
               </span>
             </div>
 
             {page ? (
-              <div style={{ flexShrink: 1, height: "100%" }}>
-                <h1>Friends List Test</h1>
-                <ul>
-                  {state.map((x) => {
-                    return <li key={Math.random()}> {x.data().username} </li>;
-                  })}
-                </ul>
+              <div
+                style={{
+                  flexShrink: 1,
+                  height: "100%",
+                  fontFamily: "monospace",
+                }}
+              >
+                <h1
+                  style={{
+                    textAlign: "center",
+                    marginTop: 5,
+                    width: "100%",
+                    borderBottom: "dotted",
+                    borderBottomColor: "black",
+                    borderBottomWidth: 1,
+                  }}
+                >
+                  Friend List
+                </h1>
+
+                <Table striped bordered hover style={{ overflow: "scroll" }}>
+                  <thead>
+                    <tr>
+                      <th>User Name</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {state.map((x) => {
+                      return (
+                        <tr style={{ width: "100%" }} key={Math.random()}>
+                          {" "}
+                          <td style={{ width: "80%" }}>
+                            {" "}
+                            {x.data().username}{" "}
+                          </td>
+                          <td style={{ width: "20%" }}>
+                            {" "}
+                            <Button
+                              onClick={() => Delete(x.id)}
+                              variant="danger"
+                            >
+                              Delete Friend
+                            </Button>{" "}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </Table>
+                <ul></ul>
               </div>
             ) : (
               <div style={{ flexShrink: 1, height: "100%" }}>

@@ -2,6 +2,11 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { createContext, useEffect, useMemo, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { auth, db } from "../config/FirebaseConfig";
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+
+
+
 
 const RandomContext = createContext();
 
@@ -44,13 +49,22 @@ const RandomProvider = ({ children }) => {
 
   const navigation = useNavigate();
 
+  // swa2
+
+  const MySwal = withReactContent(Swal)
+
   const searchRandom = () => {
     setRandomFriends(
       pureDataUsers[Math.floor(Math.random() * pureDataUsers.length)]
     );
     if (FilterRandom.length <= 0) {
-      alert("You've Added Anyone You Can Add Friend Try Next Time");
-      setShow(false)
+     setShow(false);
+     MySwal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: "You've Added Anyone You Can Add Friend Try Next Time!",
+      heightAuto: "100%"
+    });
     } else {
       navigation("/Random");
       setShow(true)
