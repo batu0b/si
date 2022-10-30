@@ -1,3 +1,6 @@
+Login , Add friend, like and dislike button for articles, There are basic features of social media application such as adding random friends and seeing the posts shared by your friends.
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
